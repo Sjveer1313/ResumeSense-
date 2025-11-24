@@ -89,6 +89,20 @@
                     <h3>Job Description Match Details</h3>
                     <div id="matchDetails"></div>
                 </div>
+
+                <!-- Resume Insights Tabs -->
+                <div class="result-panel tabbed-panel" id="insightsPanel" style="display: none;">
+                    <div class="tab-header">
+                        <button type="button" class="tab-btn active" data-target="projectsTab">Projects</button>
+                        <button type="button" class="tab-btn" data-target="achievementsTab">Achievements</button>
+                    </div>
+                    <div id="projectsTab" class="tab-content active">
+                        <div id="projectsList" class="card-list"></div>
+                    </div>
+                    <div id="achievementsTab" class="tab-content">
+                        <div id="achievementsList" class="card-list"></div>
+                    </div>
+                </div>
             </div>
 
             <div id="error" class="error-message" style="display: none;"></div>

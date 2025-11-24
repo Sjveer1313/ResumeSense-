@@ -427,6 +427,97 @@ h2 {
     margin-bottom: 10px;
 }
 
+.tabbed-panel {
+    border-left: none;
+    padding: 0;
+    background: transparent;
+}
+
+.tab-header {
+    display: flex;
+    gap: 10px;
+    padding: 0 0 15px 0;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e0e7ff;
+    border-radius: 8px;
+    background: white;
+    font-weight: 600;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: #667eea;
+    color: white;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.project-card,
+.achievement-card {
+    background: white;
+    padding: 18px;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.project-card h4,
+.achievement-card h4 {
+    margin-bottom: 8px;
+    color: #343a40;
+}
+
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.tech-badge {
+    background: #e0e7ff;
+    color: #3f51b5;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.card-meta {
+    font-size: 0.85em;
+    color: #6c757d;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.empty-message {
+    color: #6c757d;
+    font-style: italic;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     header h1 {
