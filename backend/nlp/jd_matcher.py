@@ -187,7 +187,15 @@ class JDMatcher:
             'what', 'which', 'who', 'when', 'where', 'why', 'how', 'all', 'each',
             'every', 'both', 'few', 'more', 'most', 'other', 'some', 'such',
             'only', 'own', 'same', 'so', 'than', 'too', 'very', 'just', 'now',
-            'work', 'job', 'position', 'role', 'team', 'company', 'years', 'experience'
+            'work', 'job', 'position', 'role', 'team', 'company', 'years', 'experience',
+            'responsible', 'responsibilities', 'requirement', 'requirements',
+            'preferred', 'including', 'include', 'ensure', 'ensuring', 'across',
+            'within', 'using', 'leveraging', 'strong', 'excellent', 'communication',
+            'collaboration', 'collaborative', 'stakeholder', 'stakeholders',
+            'deliver', 'delivery', 'provide', 'ability', 'candidate', 'looking',
+            'seeking', 'fast', 'paced', 'environment', 'detail', 'detailed',
+            'driven', 'passion', 'passionate', 'motivated',
+            'self', 'starter', 'dynamic', 'highly', 'plus'
         }
         
         # Filter out stop words, short words, and scientific terms (already counted separately)

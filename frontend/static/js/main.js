@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnLoader = document.getElementById('btnLoader');
     const resultsSection = document.getElementById('results');
     const errorDiv = document.getElementById('error');
+    setupInsightTabs();
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -86,6 +87,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (data.power_verbs) {
             displayPowerVerbs(data.power_verbs);
         }
+
+        // Resume insights (projects & achievements)
+        displayResumeInsights(data.resume_insights);
     }
 
     function displayATSReport(atsReport) {
@@ -213,6 +217,94 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '</div>';
 
         matchDetailsDiv.innerHTML = html;
+    }
+
+    function displayResumeInsights(insights) {
+        const panel = document.getElementById('insightsPanel');
+
+        if (!insights || ((!insights.projects || insights.projects.length === 0) &&
+            (!insights.achievements || insights.achievements.length === 0))) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        panel.style.display = 'block';
+        renderProjects(insights.projects || []);
+        renderAchievements(insights.achievements || []);
+    }
+
+    function renderProjects(projects) {
+        const container = document.getElementById('projectsList');
+        if (!projects.length) {
+            container.innerHTML = '<p class="empty-message">No project highlights detected. Add quantified, tech-focused projects to boost credibility.</p>';
+            return;
+        }
+
+        container.innerHTML = projects.map(project => {
+            const techStackHtml = project.tech_stack && project.tech_stack.length
+                ? `<div class="tech-stack">
+                        ${project.tech_stack.map(tech => `<span class="tech-badge">${tech}</span>`).join('')}
+                   </div>`
+                : '';
+
+            const confidence = project.confidence !== undefined
+                ? `<div class="card-meta">Confidence ${Math.round(project.confidence * 100)}%</div>`
+                : '';
+
+            return `
+                <div class="project-card">
+                    ${confidence}
+                    <h4>${project.title}</h4>
+                    <p>${project.summary}</p>
+                    ${techStackHtml}
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderAchievements(achievements) {
+        const container = document.getElementById('achievementsList');
+        if (!achievements.length) {
+            container.innerHTML = '<p class="empty-message">No co-curricular achievements detected. Highlight leadership roles, awards, or community work.</p>';
+            return;
+        }
+
+        container.innerHTML = achievements.map(item => {
+            const impactHtml = item.impact_keywords && item.impact_keywords.length
+                ? `<div class="tech-stack" style="margin-top: 10px;">
+                        ${item.impact_keywords.map(keyword => `<span class="tech-badge">${keyword}</span>`).join('')}
+                   </div>`
+                : '';
+
+            return `
+                <div class="achievement-card">
+                    <div class="card-meta">${item.category}</div>
+                    <h4>${item.title}</h4>
+                    <p>${item.details}</p>
+                    ${impactHtml}
+                </div>
+            `;
+        }).join('');
+    }
+
+    function setupInsightTabs() {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.classList.contains('active')) return;
+
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(tab => tab.classList.remove('active'));
+
+                button.classList.add('active');
+                const target = document.getElementById(button.dataset.target);
+                if (target) {
+                    target.classList.add('active');
+                }
+            });
+        });
     }
 
     function getScoreColor(score) {
