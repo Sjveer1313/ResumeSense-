@@ -362,10 +362,6 @@ git push heroku main
 - Considers ATS compliance, keywords, metrics, etc.
 
 
-## 📄 License
-
-This project is open source and available for educational purposes.
-
 ## 🐛 Troubleshooting
 
 ### Database Connection Issues
