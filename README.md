@@ -265,6 +265,4 @@ Contributions are welcome!
 
 ---
 
-Built with ❤️ for job seekers, recruiters, and career coaches who want feedback they can trust. Happy analyzing!
-
 

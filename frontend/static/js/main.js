@@ -94,33 +94,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayATSReport(atsReport) {
         const atsPanel = document.getElementById('atsPanel');
-        const issuesDiv = document.getElementById('atsIssues');
         const recommendationsDiv = document.getElementById('atsRecommendations');
 
         atsPanel.style.display = 'block';
+        recommendationsDiv.innerHTML = '';
 
-        // Display issues
-        if (atsReport.issues && atsReport.issues.length > 0) {
-            issuesDiv.innerHTML = '<h4>Issues Found:</h4>';
-            atsReport.issues.forEach(issue => {
-                const issueItem = document.createElement('div');
-                issueItem.className = 'issue-item';
-                issueItem.textContent = issue;
-                issuesDiv.appendChild(issueItem);
-            });
-        } else {
-            issuesDiv.innerHTML = '<p style="color: #28a745; font-weight: 600;">✓ No major issues found!</p>';
-        }
+        const summary = document.createElement('div');
+        summary.className = 'recommendation-item neutral';
+        summary.innerHTML = `
+            <div>
+                <strong>Section Coverage</strong><br>
+                Education: ${atsReport.section_checks.education ? '✅' : '⚠️'} |
+                Experience: ${atsReport.section_checks.experience ? '✅' : '⚠️'} |
+                Skills: ${atsReport.section_checks.skills ? '✅' : '⚠️'}
+            </div>
+        `;
+        recommendationsDiv.appendChild(summary);
 
         // Display recommendations
         if (atsReport.recommendations && atsReport.recommendations.length > 0) {
-            recommendationsDiv.innerHTML = '<h4>Recommendations:</h4>';
+            const title = document.createElement('h4');
+            title.textContent = 'Recommendations';
+            recommendationsDiv.appendChild(title);
+
             atsReport.recommendations.forEach(rec => {
                 const recItem = document.createElement('div');
                 recItem.className = 'recommendation-item';
                 recItem.textContent = rec;
                 recommendationsDiv.appendChild(recItem);
             });
+        } else {
+            const ok = document.createElement('p');
+            ok.style.color = '#28a745';
+            ok.style.fontWeight = '600';
+            ok.textContent = '✓ Resume passes key ATS checks.';
+            recommendationsDiv.appendChild(ok);
         }
     }
 
