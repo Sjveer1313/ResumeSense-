@@ -49,6 +49,7 @@ class ResumeInsights:
         'mysql', 'postgresql', 'postgres', 'mongodb', 'redis', 'dynamodb',
         'snowflake', 'bigquery', 'redshift', 'elastic', 'elasticsearch'
     }
+    TECH_TOKENS = {term.lower() for term in TECH_TERMS}
 
     PROJECT_SECTION_HEADERS = [
         'project', 'projects', 'project experience', 'technical projects',
@@ -60,6 +61,11 @@ class ResumeInsights:
         'recognition', 'leadership', 'activities', 'co-curricular',
         'extracurricular', 'volunteer', 'volunteering'
     ]
+
+    NOISE_PREFIXES = {
+        'confidence', 'achievement', 'achievements', 'projects', 'project',
+        'github', 'git hub'
+    }
 
     @staticmethod
     def extract_insights(resume_text: str) -> Dict[str, List[Dict]]:
@@ -127,10 +133,13 @@ class ResumeInsights:
                 if title.lower() in seen_titles:
                     continue
 
-                confidence = min(1.0, 0.4 + min(len(sentence) / 300, 0.3))
+                cleaned_sentence = ResumeInsights._clean_entry_text(sentence.strip())
+                if len(cleaned_sentence.split()) < 6:
+                    continue
+                confidence = min(1.0, 0.4 + min(len(cleaned_sentence) / 300, 0.3))
                 projects.append({
                     'title': title,
-                    'summary': sentence.strip(),
+                    'summary': cleaned_sentence,
                     'tech_stack': tech_stack,
                     'confidence': round(confidence, 2)
                 })
@@ -174,9 +183,10 @@ class ResumeInsights:
                 category = 'Co-curricular' if co_curricular_hit else 'Achievement'
                 impact_keywords = ResumeInsights._extract_impact_keywords(lower)
 
+                cleaned_details = ResumeInsights._clean_entry_text(sentence.strip())
                 achievements.append({
                     'title': title,
-                    'details': sentence.strip(),
+                    'details': cleaned_details,
                     'category': category,
                     'impact_keywords': impact_keywords
                 })
@@ -200,22 +210,25 @@ class ResumeInsights:
     def _infer_project_title(sentence: str) -> str:
         match = re.search(r'(?:project|application|platform|system)\s*[:\-]\s*([A-Za-z0-9 ,&()\/\-]+)', sentence, re.IGNORECASE)
         if match:
-            candidate = match.group(1).strip()
+            candidate = ResumeInsights._clean_entry_text(match.group(1).strip())
             return ResumeInsights._trim_title(candidate)
 
         # Use first clause as fallback
         clause = sentence.split(',')[0]
         clause = clause.split(' - ')[0]
         clause = clause.split('. ')[0]
+        clause = ResumeInsights._clean_entry_text(clause)
         return ResumeInsights._trim_title(clause)
 
     @staticmethod
     def _infer_achievement_title(sentence: str) -> str:
         match = re.search(r'(?:awarded|won|received|recognized for)\s+([A-Za-z0-9 ,&()\/\-]+)', sentence, re.IGNORECASE)
         if match:
-            return ResumeInsights._trim_title(match.group(1))
+            cleaned = ResumeInsights._clean_entry_text(match.group(1))
+            return ResumeInsights._trim_title(cleaned)
 
         clause = sentence.split('. ')[0]
+        clause = ResumeInsights._clean_entry_text(clause)
         return ResumeInsights._trim_title(clause)
 
     @staticmethod
@@ -299,9 +312,10 @@ class ResumeInsights:
                 confidence += 0.2
             confidence += 0.2 * length_factor
 
+            summary = ResumeInsights._clean_entry_text(entry.strip())
             projects.append({
                 'title': title,
-                'summary': entry.strip(),
+                'summary': summary,
                 'tech_stack': tech_stack,
                 'confidence': round(min(confidence, 0.99), 2)
             })
@@ -319,9 +333,10 @@ class ResumeInsights:
             title = ResumeInsights._infer_achievement_title(entry)
             impact_keywords = ResumeInsights._extract_impact_keywords(lower)
 
+            details = ResumeInsights._clean_entry_text(entry.strip())
             achievements.append({
                 'title': title,
-                'details': entry.strip(),
+                'details': details,
                 'category': category,
                 'impact_keywords': impact_keywords
             })
@@ -340,8 +355,12 @@ class ResumeInsights:
         def commit_entry():
             if current:
                 merged = " ".join(part.strip() for part in current if part.strip())
-                if len(merged.split()) >= 6:
-                    entries.append(merged)
+                normalized = merged.lower()
+                if ResumeInsights._is_noise_entry(normalized):
+                    return []
+                cleaned_entry = ResumeInsights._clean_entry_text(merged)
+                if len(cleaned_entry.split()) >= 6:
+                    entries.append(cleaned_entry)
             return []
 
         for line in lines:
@@ -350,18 +369,26 @@ class ResumeInsights:
                 current = commit_entry()
                 continue
 
-            if re.match(r'^[-*]\s+', stripped):
-                current.append(stripped.lstrip('-* ').strip())
+            if ResumeInsights._is_noise_line(stripped):
                 continue
 
-            starts_new_entry = ResumeInsights._starts_new_entry(stripped)
+            cleaned_line = stripped.lstrip('-* ').strip()
+            if not cleaned_line:
+                continue
+
+            short_descriptor = len(cleaned_line.split()) <= 4 and not re.search(r'[:|]', cleaned_line)
+            if short_descriptor and current:
+                current.append(cleaned_line)
+                continue
+
+            starts_new_entry = ResumeInsights._starts_new_entry(cleaned_line)
             if current and starts_new_entry:
                 current = commit_entry()
-                current = [stripped]
+                current = [cleaned_line]
             elif not current:
-                current = [stripped]
+                current = [cleaned_line]
             else:
-                current.append(stripped)
+                current.append(cleaned_line)
 
         commit_entry()
         return entries
@@ -381,4 +408,34 @@ class ResumeInsights:
         if re.search(r'\b20\d{2}\b', line):
             return True
         return False
+
+    @staticmethod
+    def _is_noise_line(line: str) -> bool:
+        normalized = re.sub(r'[^a-z0-9 ]', ' ', line.lower()).strip()
+        return normalized in ResumeInsights.NOISE_PREFIXES or normalized == ''
+
+    @staticmethod
+    def _is_noise_entry(entry_lower: str) -> bool:
+        if len(entry_lower) < 10:
+            return True
+        if any(entry_lower.startswith(prefix) for prefix in ResumeInsights.NOISE_PREFIXES):
+            return True
+        return False
+
+    @staticmethod
+    def _clean_entry_text(text: str) -> str:
+        cleaned = re.sub(r'\s+', ' ', text).strip()
+        while cleaned:
+            lowered = cleaned.lower()
+            first_token = lowered.split(' ', 1)[0]
+            if first_token in ResumeInsights.NOISE_PREFIXES or first_token in ResumeInsights.TECH_TOKENS:
+                parts = cleaned.split(' ', 1)
+                cleaned = parts[1].strip() if len(parts) > 1 else ''
+                continue
+            if lowered.startswith('confidence '):
+                parts = cleaned.split(' ', 2)
+                cleaned = parts[2] if len(parts) > 2 else ''
+                continue
+            break
+        return cleaned.strip()
 
