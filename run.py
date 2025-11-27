@@ -16,17 +16,9 @@ app.config['SECRET_KEY'] = Config.SECRET_KEY
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = Config.MAX_UPLOAD_SIZE
 
-# ================================
-# ADD THIS ROUTE (RUN ONCE)
-# ================================
-@app.route('/init-db')
-def init_db_route():
-    from backend.db.database import init_db
-    init_db()
-    return {"status": "Database tables created"}
-
 # Enable CORS
 CORS(app)
+
 # Register API blueprint
 app.register_blueprint(api_bp, url_prefix='/api')
 
@@ -60,4 +52,3 @@ if __name__ == '__main__':
     
     # Run in development mode
     app.run(debug=True, host='0.0.0.0', port=5001)
-
