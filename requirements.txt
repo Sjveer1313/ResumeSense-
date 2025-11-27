@@ -1,1 +1,23 @@
-# ResumeSense - Python Dependencies # Web Framework Flask==3.0.0 flask-cors==4.0.0 Werkzeug==3.0.1 # PDF Processing PyMuPDF==1.23.8 # Database PyMySQL==1.1.0 # Machine Learning scikit-learn>=1.3.2 numpy>=1.26.0 # Environment Variables python-dotenv==1.0.0 # Testing (optional, for development) pytest==7.4.3 pytest-cov==4.1.0
+# ResumeSense - Python Dependencies
+
+# Web Framework 
+Flask==3.0.0 
+flask-cors==4.0.0 
+Werkzeug==3.0.1 
+
+# PDF Processing 
+PyMuPDF==1.23.8 
+
+# Database 
+PyMySQL==1.1.0 
+
+# Machine Learning 
+scikit-learn>=1.3.2 
+numpy>=1.26.0 
+
+# Environment Variables 
+python-dotenv==1.0.0 
+
+# Testing (optional, for development) 
+pytest==7.4.3 
+pytest-cov==4.1.0
