@@ -240,29 +240,4 @@ Add new tests alongside new NLP/ML helpers to keep regression coverage high.
 
 ---
 
-## Deployment Notes
-
-- **Procfile (Heroku / Render)**: `web: gunicorn run:app`
-- **Gunicorn command**: `gunicorn run:app --bind 0.0.0.0:$PORT`
-- **Environment**: set `FLASK_ENV=production`, unique `SECRET_KEY`, and production DB credentials.
-- **Static files**: served by Flask; for CDNs, point to `frontend/static`.
-- **Uploads**: ensure `UPLOAD_FOLDER` is writable (mount persistent volume or S3 adapter).
-
----
-
-## Roadmap & Contributions
-
-- [ ] DOCX ingestion & OCR fallback
-- [ ] Transformer-based semantic matcher
-- [ ] Exportable PDF/HTML reports
-- [ ] Multi-user workspace & sharing
-- [ ] Job board integrations
-
-Contributions are welcome!  
-1. Fork → Branch → PR  
-2. Write/extend tests  
-3. Document any configuration changes
-
----
-
 
